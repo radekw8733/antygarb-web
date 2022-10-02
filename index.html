@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head></head>
+<link rel="stylesheet" href="style.css">
+
+<body>
+    <main>
+        <div class="header">
+            <img width="64px" height="64px" src="antygarb_icon.svg">
+            <h1 class="headerText">Antygarb</h1>
+        </div>
+
+        <span>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa rem amet commodi ipsum, sed fugit nobis
+            provident. Consectetur excepturi, ipsam eos dolores ducimus animi est exercitationem dolorum dolor libero
+            magni.
+        </span>
+
+        <div id="preview">
+            <!-- video -->
+            <canvas id="canvas" width="640" height="480" hidden></canvas>
+            <video id="cameraFeed" autoplay="true" width="640" height="480" hidden></video>
+
+            <span class="infoText" id="infoText">You're sitting wrong!</span>
+            <button id="calibrationButton" onclick="calibratePose()">Calibrate</button>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
