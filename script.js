@@ -4,6 +4,8 @@ var canvas = document.getElementById("canvas")
 var video = document.getElementById("cameraFeed")
 var ctx = canvas.getContext("2d")
 var infoText = document.getElementById("infoText")
+var permissionButton = document.getElementById("startButton")
+var previewContainer = document.getElementById("preview")
 var screenshotDelay = 500 // how often should algorithm take webcam image capture
 
 var leftShoulder
@@ -28,6 +30,23 @@ function calibratePose() {
 // send info about pose whether it is good or bad
 // validPose should be boolean
 function sendInfo(validPose) {
+    if (wrongPoseCounter + validPoseCounter >= (60 / (screenshotDelay * 0.001))) {
+        new Notification("Antygarb")
+
+        wrongPoseCounter = 0
+        validPoseCounter = 0
+    }
+    else {
+        if (validPose == true) {
+            console.log("counters: " + wrongPoseCounter + " " + validPoseCounter)
+            validPoseCounter++
+        }
+        else if (validPose == false) {
+            console.log("counters: " + wrongPoseCounter + " " + validPoseCounter)
+            wrongPoseCounter++
+        }
+    }
+
     if (validPose == true) {
         infoText.style.visibility = "hidden";
     }
@@ -39,7 +58,7 @@ function sendInfo(validPose) {
 function checkForValidPose() {
     // check if shoulders are on the same height
     if (Math.abs(leftShoulder["y"] - rightShoulder["y"]) > 30) {
-        console.log("Wrong pose detected! Shoulders not on the same height")
+        console.log("=== Wrong pose detected! Shoulders not on the same height ===")
         sendInfo(false)
         return
     }
@@ -58,7 +77,7 @@ function checkForValidPose() {
     // check if shoulder aren't too big
     // and check if the user is lying back 
     if (leftDistance + rightDistance > 30) { 
-        console.log("Wrong pose detected! Distance between shoulders: " + (leftDistance + rightDistance))
+        console.log("=== Wrong pose detected! Distance between shoulders: " + (leftDistance + rightDistance) + " ===")
         sendInfo(false)
         return
     }
@@ -88,6 +107,10 @@ function drawKeypoints(pose) {
             });
             checkForValidPose(leftShoulder, rightShoulder);
         }
+        else {
+            validPoseCounter = 0 // reset counters for timer to restart
+            wrongPoseCounter = 0
+        }
     }
 }
 
@@ -102,17 +125,28 @@ function estimatePose(detector) {
 
 async function setupDetector() {
     const detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet)
-
-    var cameraFeed = document.getElementById("cameraFeed")
-    if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({video: true})
-            .then(function (stream) {
-                cameraFeed.srcObject = stream
-                setTimeout(() => {
-                    cameraFeed.addEventListener("play", estimatePose(detector))
-                }, 2000)
-            })
-    }
+    video.addEventListener("loadeddata", estimatePose(detector))
 }
 
-setupDetector()
+function alertForDeniedPermission() { alert("You need to grant permission both for webcam access and receiving notifications for this application to work!") }
+
+function startMonitoring() {
+    permissionButton.style.display = "none"
+    previewContainer.style.display = "initial"
+
+    if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({video: true}).then((stream) => { // ask for webcam access
+            video.srcObject = stream
+            Notification.requestPermission().then((permission) => { // ask for notifications access
+                if (permission === "granted") {
+                    setupDetector()
+                }
+                else {
+                    alertForDeniedPermission()
+                }
+            })
+        }).catch((err) => {
+            alertForDeniedPermission()
+        })
+    }
+}

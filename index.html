@@ -17,9 +17,10 @@
             magni.
         </span>
 
-        <div id="preview">
+        <button id="startButton" class="startButton" onclick="startMonitoring()">Start monitoring</button>
+        <div id="preview" class="preview">
             <!-- video -->
-            <canvas id="canvas" width="640" height="480" hidden></canvas>
+            <canvas id="canvas" width="640" height="480"></canvas>
             <video id="cameraFeed" autoplay="true" width="640" height="480" hidden></video>
 
             <span class="infoText" id="infoText">You're sitting wrong!</span>
@@ -31,6 +32,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    <script src="HackTimer.min.js"></script>
     <script src="script.js"></script>
 </body>
 
