@@ -12,19 +12,17 @@
         </div>
 
         <span>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa rem amet commodi ipsum, sed fugit nobis
-            provident. Consectetur excepturi, ipsam eos dolores ducimus animi est exercitationem dolorum dolor libero
-            magni.
+            Instrukcja: kliknij przycisk "Uruchom program", przydziel uprawnienia na dostęp do kamery i powiadomień. Nastepnie wyprostuj się i naciśnij przycisk "Kalibruj". Aplikacja zacznie w tle analizować postawę ciała i wysył
         </span>
 
-        <button id="startButton" class="startButton" onclick="startMonitoring()">Start monitoring</button>
+        <button id="startButton" class="startButton" onclick="startMonitoring()">Uruchom program</button>
         <div id="preview" class="preview">
             <!-- video -->
             <canvas id="canvas" width="640" height="480"></canvas>
             <video id="cameraFeed" autoplay="true" width="640" height="480" hidden></video>
 
-            <span class="infoText" id="infoText">You're sitting wrong!</span>
-            <button id="calibrationButton" onclick="calibratePose()">Calibrate</button>
+            <span class="infoText" id="infoText">Popraw swoją postawę!</span>
+            <button id="calibrationButton" onclick="calibratePose()">Kalibruj</button>
         </div>
     </main>
 

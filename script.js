@@ -128,7 +128,7 @@ async function setupDetector() {
     video.addEventListener("loadeddata", estimatePose(detector))
 }
 
-function alertForDeniedPermission() { alert("You need to grant permission both for webcam access and receiving notifications for this application to work!") }
+function alertForDeniedPermission() { alert("Aby ta aplikacje poprawnie działała potrzeba przydzielić uprawnienia dla kamery oraz otrzymywania powiadomień") }
 
 function startMonitoring() {
     permissionButton.style.display = "none"
