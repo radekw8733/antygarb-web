@@ -11,53 +11,65 @@ var screenshotDelay = 500 // how often should algorithm take webcam image captur
 var leftShoulder
 var rightShoulder
 var shoulderCalibrated = {
+    isCalibrated: false,
     leftShoulder: {x: 0, y: 0},
     rightShoulder: {x: 0, y: 0},
+    shoulderLevel: 0
 }
 var wrongPoseCounter = 0
-var validPoseCounter = 0
 
 function calibratePose() {
     if (leftShoulder != undefined && rightShoulder != undefined) {
+        shoulderCalibrated.isCalibrated = true
+
         shoulderCalibrated.leftShoulder.x = leftShoulder["x"]
         shoulderCalibrated.leftShoulder.y = leftShoulder["y"]
 
         shoulderCalibrated.rightShoulder.x = rightShoulder["x"]
         shoulderCalibrated.rightShoulder.y = rightShoulder["y"]
+
+        shoulderCalibrated.shoulderLevel = Math.abs(leftShoulder["y"] - rightShoulder["y"])
     }
 }
 
-// send info about pose whether it is good or bad
+// send info about pose whether it is good or bad every 30 seconds
 // validPose should be boolean
 function sendInfo(validPose) {
-    if (wrongPoseCounter + validPoseCounter >= (60 / (screenshotDelay * 0.001))) {
-        new Notification("Antygarb")
+    if (shoulderCalibrated.isCalibrated) {
+        if (wrongPoseCounter >= (15 / (screenshotDelay * 0.001))) {
+            sendNotification()
 
-        wrongPoseCounter = 0
-        validPoseCounter = 0
-    }
-    else {
+            wrongPoseCounter = 0
+        }
+        else {
+            if (validPose == true) {
+                console.log("counter: " + wrongPoseCounter)
+                wrongPoseCounter = 0
+            }
+            else if (validPose == false) {
+                console.log("counter: " + wrongPoseCounter)
+                wrongPoseCounter++
+            }
+        }
+    
         if (validPose == true) {
-            console.log("counters: " + wrongPoseCounter + " " + validPoseCounter)
-            validPoseCounter++
+            infoText.style.visibility = "hidden"
         }
         else if (validPose == false) {
-            console.log("counters: " + wrongPoseCounter + " " + validPoseCounter)
-            wrongPoseCounter++
+            infoText.innerText = "Popraw swoją postawę!"
+            infoText.style.color = "red"
+            infoText.style.visibility = "visible"
         }
     }
-
-    if (validPose == true) {
-        infoText.style.visibility = "hidden";
-    }
-    else if (validPose == false) {
-        infoText.style.visibility = "visible";
+    else {
+        infoText.style.visibility = "visible"
+        infoText.innerText = "Skalibruj swoją pozycję"
     }
 }
 
 function checkForValidPose() {
     // check if shoulders are on the same height
-    if (Math.abs(leftShoulder["y"] - rightShoulder["y"]) > 30) {
+    if (Math.abs(leftShoulder["y"] - rightShoulder["y"]) - shoulderCalibrated.shoulderLevel > 30) {
         console.log("=== Wrong pose detected! Shoulders not on the same height ===")
         sendInfo(false)
         return
@@ -85,7 +97,7 @@ function checkForValidPose() {
 }
 
 function drawKeypoints(pose) {
-    ctx.drawImage(video, 0, 0, video.width, video.height); // embed webcam stream into canvas
+    ctx.drawImage(video, 0, 0, video.width, video.height) // embed webcam stream into canvas
     ctx.fillStyle = "#00FF00" // green keypoints
 
     if (pose.length != 0) {
@@ -96,31 +108,51 @@ function drawKeypoints(pose) {
                         rightShoulder = point
                         break
                     case "left_shoulder":
-                        leftShoulder = point;
+                        leftShoulder = point
                         break
                     default:
                         break
                 }
                 if (point["score"] > 0.4) {
-                    ctx.fillRect(Math.round(point["x"]), Math.round(point["y"]), 5, 5); // draw keypoints
+                    ctx.fillRect(Math.round(point["x"]), Math.round(point["y"]), 5, 5) // draw keypoints
                 }
-            });
-            checkForValidPose(leftShoulder, rightShoulder);
+            })
+            checkForValidPose(leftShoulder, rightShoulder)
         }
         else {
-            validPoseCounter = 0 // reset counters for timer to restart
-            wrongPoseCounter = 0
+            wrongPoseCounter = 0 // reset counters for timer to restart
         }
     }
 }
 
 function estimatePose(detector) {
+    // setCanvasSize()
+
     setTimeout(async () => {
         pose = await detector.estimatePoses(cameraFeed)
         console.log(pose)
         drawKeypoints(pose)
         estimatePose(detector) // recurse
     }, screenshotDelay)
+}
+
+function setCanvasSize(stream) {
+    video.width = stream.getVideoTracks()[0].getSettings().width
+    video.height = stream.getVideoTracks()[0].getSettings().height
+    ctx.canvas.width = stream.getVideoTracks()[0].getSettings().width
+    ctx.canvas.height = stream.getVideoTracks()[0].getSettings().height
+    // ctx.scale(0.5, 0.5)
+}
+
+function sendNotification() {
+    document.getElementById("notificationSound").play()
+    new Notification("Antygarb", {
+        body: "Twoja postawa jest niepoprawna. Wyprostuj się",
+        image: window.location.href + "/antygarb_icon.svg",
+        renotify: true,
+        requireInteraction: true,
+        silent: true
+    })
 }
 
 async function setupDetector() {
@@ -131,14 +163,17 @@ async function setupDetector() {
 function alertForDeniedPermission() { alert("Aby ta aplikacje poprawnie działała potrzeba przydzielić uprawnienia dla kamery oraz otrzymywania powiadomień") }
 
 function startMonitoring() {
-    permissionButton.style.display = "none"
-    previewContainer.style.display = "initial"
-
     if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({video: true}).then((stream) => { // ask for webcam access
+        navigator.mediaDevices.getUserMedia({video: {
+            width: {min: 640, max: 1280},
+            height: {min: 480, max: 720}
+        }}).then((stream) => { // ask for webcam access
+            setCanvasSize(stream)
             video.srcObject = stream
             Notification.requestPermission().then((permission) => { // ask for notifications access
                 if (permission === "granted") {
+                    permissionButton.style.display = "none"
+                    previewContainer.style.display = "initial"
                     setupDetector()
                 }
                 else {

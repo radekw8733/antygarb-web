@@ -18,10 +18,12 @@
         <button id="startButton" class="startButton" onclick="startMonitoring()">Uruchom program</button>
         <div id="preview" class="preview">
             <!-- video -->
-            <canvas id="canvas" width="640" height="480"></canvas>
-            <video id="cameraFeed" autoplay="true" width="640" height="480" hidden></video>
+            <canvas id="canvas"></canvas>
 
-            <span class="infoText" id="infoText">Popraw swoją postawę!</span>
+            <video id="cameraFeed" autoplay="true" hidden></video>
+            <audio id="notificationSound" src="notification.mp3" hidden></audio>
+
+            <span class="infoText" id="infoText"></span>
             <button id="calibrationButton" onclick="calibratePose()">Kalibruj</button>
         </div>
     </main>
