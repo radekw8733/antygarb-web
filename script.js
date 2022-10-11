@@ -148,7 +148,7 @@ function sendNotification() {
     document.getElementById("notificationSound").play()
     new Notification("Antygarb", {
         body: "Twoja postawa jest niepoprawna. Wyprostuj się",
-        image: window.location.href + "/antygarb_icon.svg",
+        image: window.location.href + "/antihump_icon.svg",
         renotify: true,
         requireInteraction: true,
         silent: true
