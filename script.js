@@ -6,7 +6,8 @@ var ctx = canvas.getContext("2d")
 var infoText = document.getElementById("infoText")
 var permissionButton = document.getElementById("startButton")
 var previewContainer = document.getElementById("preview")
-var screenshotDelay = 500 // how often should algorithm take webcam image capture
+var screenshotDelay = 100 // how often should algorithm take webcam image capture
+var pose
 
 var leftShoulder
 var rightShoulder
@@ -67,6 +68,20 @@ function sendInfo(validPose) {
     }
 }
 
+function embedVideo() {
+    ctx.drawImage(video, 0, 0, video.width, video.height) // embed webcam stream into canvas
+    if (pose != undefined && pose[0] != undefined) {
+        pose[0]["keypoints"].forEach(point => {
+            if (point["score"] > 0.4) {
+                ctx.fillRect(Math.round(point["x"]), Math.round(point["y"]), 5, 5) // draw keypoints
+            }
+        })
+    }
+    setTimeout(function() {
+        embedVideo()
+    }, 0);
+}
+
 function checkForValidPose() {
     // check if shoulders are on the same height
     if (Math.abs(leftShoulder["y"] - rightShoulder["y"]) - shoulderCalibrated.shoulderLevel > 30) {
@@ -97,7 +112,6 @@ function checkForValidPose() {
 }
 
 function drawKeypoints(pose) {
-    ctx.drawImage(video, 0, 0, video.width, video.height) // embed webcam stream into canvas
     ctx.fillStyle = "#00FF00" // green keypoints
 
     if (pose.length != 0) {
@@ -112,9 +126,6 @@ function drawKeypoints(pose) {
                         break
                     default:
                         break
-                }
-                if (point["score"] > 0.4) {
-                    ctx.fillRect(Math.round(point["x"]), Math.round(point["y"]), 5, 5) // draw keypoints
                 }
             })
             checkForValidPose(leftShoulder, rightShoulder)
@@ -170,6 +181,7 @@ function startMonitoring() {
         }}).then((stream) => { // ask for webcam access
             setCanvasSize(stream)
             video.srcObject = stream
+            embedVideo()
             Notification.requestPermission().then((permission) => { // ask for notifications access
                 if (permission === "granted") {
                     permissionButton.style.display = "none"
@@ -181,6 +193,7 @@ function startMonitoring() {
                 }
             })
         }).catch((err) => {
+            console.log(err)
             alertForDeniedPermission()
         })
     }
