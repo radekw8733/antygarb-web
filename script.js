@@ -68,8 +68,7 @@ function sendInfo(validPose) {
     }
 }
 
-function embedVideo() {
-    ctx.drawImage(video, 0, 0, video.width, video.height) // embed webcam stream into canvas
+function drawKeypoints() {
     if (pose != undefined && pose[0] != undefined) {
         pose[0]["keypoints"].forEach(point => {
             if (point["score"] > 0.4) {
@@ -77,9 +76,16 @@ function embedVideo() {
             }
         })
     }
+}
+
+function embedVideo() {
+    ctx.drawImage(video, 0, 0, video.width, video.height) // embed webcam stream into canvas
+    drawKeypoints()
+
+    // recurse as soon as we can
     setTimeout(function() {
         embedVideo()
-    }, 0);
+    }, 0)
 }
 
 function checkForValidPose() {
@@ -111,7 +117,7 @@ function checkForValidPose() {
     sendInfo(true) // otherwise your pose is good, notify user
 }
 
-function drawKeypoints(pose) {
+function setKeypoints(pose) {
     ctx.fillStyle = "#00FF00" // green keypoints
 
     if (pose.length != 0) {
@@ -137,12 +143,10 @@ function drawKeypoints(pose) {
 }
 
 function estimatePose(detector) {
-    // setCanvasSize()
-
     setTimeout(async () => {
         pose = await detector.estimatePoses(cameraFeed)
         console.log(pose)
-        drawKeypoints(pose)
+        setKeypoints(pose)
         estimatePose(detector) // recurse
     }, screenshotDelay)
 }
@@ -152,14 +156,12 @@ function setCanvasSize(stream) {
     video.height = stream.getVideoTracks()[0].getSettings().height
     ctx.canvas.width = stream.getVideoTracks()[0].getSettings().width
     ctx.canvas.height = stream.getVideoTracks()[0].getSettings().height
-    // ctx.scale(0.5, 0.5)
 }
 
 function sendNotification() {
     document.getElementById("notificationSound").play()
     new Notification("Antygarb", {
         body: "Twoja postawa jest niepoprawna. Wyprostuj się",
-        image: window.location.href + "/antihump_icon.svg",
         renotify: true,
         requireInteraction: true,
         silent: true
@@ -168,7 +170,7 @@ function sendNotification() {
 
 async function setupDetector() {
     const detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet)
-    video.addEventListener("loadeddata", estimatePose(detector))
+    video.addEventListener("loadeddata", estimatePose(detector)) // when webcam stream is ready, enable algorithm
 }
 
 function alertForDeniedPermission() { alert("Aby ta aplikacje poprawnie działała potrzeba przydzielić uprawnienia dla kamery oraz otrzymywania powiadomień") }
