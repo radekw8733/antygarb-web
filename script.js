@@ -108,8 +108,8 @@ function checkForValidPose() {
     var rightDistance = Math.sqrt((rightX * rightX) + (rightY * rightY))
 
     // check if shoulder aren't too big
-    // and check if the user is lying back 
-    if (leftDistance + rightDistance > 30) { 
+    // and check if the user is lying forward
+    if (leftDistance + rightDistance > 30 && leftY > 0 && rightY > 0) { 
         console.log("=== Wrong pose detected! Distance between shoulders: " + (leftDistance + rightDistance) + " ===")
         sendInfo(false)
         return
