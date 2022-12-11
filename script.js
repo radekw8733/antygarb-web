@@ -8,6 +8,7 @@ var permissionButton = document.getElementById("startButton")
 var previewContainer = document.getElementById("preview")
 var screenshotDelay = 100 // how often should algorithm take webcam image capture
 var pose
+var stats
 
 var leftShoulder
 var rightShoulder
@@ -168,6 +169,14 @@ function sendNotification() {
     })
 }
 
+function setupStats() {
+    document.addEventListener("visibilitychange", function sendStats() {
+        if (document.visibilityState == "hidden") {
+            navigator.sendBeacon("/stats", stats)
+        }
+    })
+}
+
 async function setupDetector() {
     const detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet)
     video.addEventListener("loadeddata", estimatePose(detector)) // when webcam stream is ready, enable algorithm
@@ -176,6 +185,8 @@ async function setupDetector() {
 function alertForDeniedPermission() { alert("Aby ta aplikacje poprawnie działała potrzeba przydzielić uprawnienia dla kamery oraz otrzymywania powiadomień") }
 
 function startMonitoring() {
+    setupStats()
+
     if (navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({video: {
             width: {min: 640, max: 1280},

@@ -1,0 +1,9 @@
+[Unit]
+Description=Antygarb backend server
+
+[Service]
+ExecStart=/usr/bin/env FLASK_APP=/var/www/antygarb/backend/main.py flask run
+Restart=always
+
+[Install]
+WantedBy=network-online.target
