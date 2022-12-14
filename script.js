@@ -4,8 +4,6 @@ var canvas = document.getElementById("canvas")
 var video = document.getElementById("cameraFeed")
 var ctx = canvas.getContext("2d")
 var infoText = document.getElementById("infoText")
-var permissionButton = document.getElementById("startButton")
-var previewContainer = document.getElementById("preview")
 var screenshotDelay = 100 // how often should algorithm take webcam image capture
 var pose
 var stats
@@ -182,6 +180,12 @@ async function setupDetector() {
     video.addEventListener("loadeddata", estimatePose(detector)) // when webcam stream is ready, enable algorithm
 }
 
+function startCss() {
+    document.getElementById("startButton").style.display = "none"
+    document.getElementById("preview").style.display = "initial"
+    document.getElementById("")
+}
+
 function alertForDeniedPermission() { alert("Aby ta aplikacje poprawnie działała potrzeba przydzielić uprawnienia dla kamery oraz otrzymywania powiadomień") }
 
 function startMonitoring() {
@@ -197,8 +201,7 @@ function startMonitoring() {
             embedVideo()
             Notification.requestPermission().then((permission) => { // ask for notifications access
                 if (permission === "granted") {
-                    permissionButton.style.display = "none"
-                    previewContainer.style.display = "initial"
+                    startCss()
                     setupDetector()
                 }
                 else {

@@ -5,16 +5,29 @@ body {
 }
 
 main {
-    width: 640px; /* width of */
-    margin: auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.card {
     padding: 20px;
+    margin: 10px;
+    display: inline;
+    max-width: min-content;
     background-color: darkgrey;
     border-radius: 10px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    /* box-shadow: 0 6px 12px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); */
+}
+
+.mainContent {
+    display: inline-flex;
+    justify-content: center;
 }
 
 .startButton {
-    margin: 50px auto 50px auto;
+    /* margin: 50px auto 50px auto; */
+    margin: 0;
     font-size: x-large;
 }
 
@@ -22,10 +35,16 @@ main {
     display: none;
 }
 
+.cameraFeed {
+    width: auto;
+    height: auto;
+}
+
 .header {
     margin: 5px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
 }
 
 .headerText {
@@ -33,6 +52,16 @@ main {
     margin-top: 0;
     margin-bottom: 0;
     margin-left: 10px;
+}
+
+.briefText {
+    display: block;
+    width: 50vh;
+}
+
+.info {
+    display: inline;
+    max-width: 40%;
 }
 
 .infoText {

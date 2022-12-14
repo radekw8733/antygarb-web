@@ -3,25 +3,30 @@
 
 <head>
     <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
     <main>
-        <div class="header">
-            <img width="64px" height="64px" src="antihump_icon.svg">
-            <h1 class="headerText">Anti-hump</h1>
+        <div class="card">
+            <div class="header">
+                <img width="64px" height="64px" src="antihump_icon.svg">
+                <h1 class="headerText">Anti-hump</h1>
+            </div>
+            
+            <div class="info">
+                <span class="briefText">
+                    Instrukcja: kliknij przycisk "Uruchom program", przydziel uprawnienia na dostęp do kamery i powiadomień. Nastepnie wyprostuj się i naciśnij przycisk "Kalibruj". Aplikacja zacznie w tle analizować postawę ciała i wysyłać powiadomienie przypominające o wyprostowaniu się.
+                </span>
+                <button id="startButton" class="startButton" onclick="startMonitoring()">Uruchom program</button>
+            </div>
         </div>
 
-        <span>
-            Instrukcja: kliknij przycisk "Uruchom program", przydziel uprawnienia na dostęp do kamery i powiadomień. Nastepnie wyprostuj się i naciśnij przycisk "Kalibruj". Aplikacja zacznie w tle analizować postawę ciała i wysyłać powiadomienie przypominające o wyprostowaniu się.
-        </span>
-
-        <button id="startButton" class="startButton" onclick="startMonitoring()">Uruchom program</button>
-        <div id="preview" class="preview">
+        <div id="preview" class="card" style="display: none">
             <!-- video -->
             <canvas id="canvas"></canvas>
 
-            <video id="cameraFeed" autoplay="true" hidden></video>
+            <video id="cameraFeed" class="cameraFeed" autoplay="true" hidden></video>
             <audio id="notificationSound" src="notification.mp3" hidden></audio>
 
             <span class="infoText" id="infoText"></span>
